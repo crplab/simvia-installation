@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   hypha-resources-db:
     image: postgres:14.3-alpine
@@ -6,26 +5,46 @@ services:
     ports:
       - "6432:5432"
     environment:
-      POSTGRES_USER: rm
-      POSTGRES_PASSWORD: rm
+      POSTGRES_USER: ${HYPHA_RESOURCE_MANAGER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_RESOURCE_MANAGER_DB_PASSWORD}
       POSTGRES_DB: myc_hypha_rm
-
+    volumes:
+      - ./pg_rm/data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
   hypha-resources:
-    image: "mycesys/hypha-resources:${IMAGE_VERSION}"
+    image: "mycesys/hypha-resources:${HYPHA_RESOURCES_VERSION}"
     container_name: hypha-resources
+    restart: on-failure
     ports:
       - "8096:8096"
+    deploy:
+      resources:
+        limits:
+          memory: ${HYPHA_RESOURCE_MANAGER_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HYPHA_RESOURCE_MANAGER_LIMIT_MAX_RAM}
     volumes:
-      - ../server/keys:/app/server/keys
+      - ./ssh/keys:/ssh/keys
     environment:
-      - SPRING_R2DBC_URL=${SPRING_R2DBC_URL}
-      - SPRING_LIQUIBASE_URL=${SPRING_LIQUIBASE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
-      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
-      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
-      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
-      - SSH_DEFAULT_KEY_PATH=${SSH_DEFAULT_KEY_PATH}
+      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-resources-db:5432/myc_hypha_rm
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-resources-db:5432/myc_hypha_rm
+      - SSH_DEFAULT_KEY_PATH=/ssh/keys/hypha
+    env_file:
+      - ./.env
     depends_on:
-      - hypha-resources-db
+      hypha-resources-db:
+        condition: service_healthy
+      vault:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

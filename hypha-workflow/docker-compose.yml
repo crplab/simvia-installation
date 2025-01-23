@@ -1,26 +1,47 @@
-version: '3.8'
 services:
   hypha-workflow-db:
     image: postgres:14.3-alpine
     container_name: hypha-workflow-db
     ports:
-      - "6433:5432"
+      - "6434:5432"
     environment:
-      POSTGRES_USER: workflow
-      POSTGRES_PASSWORD: workflow
+      POSTGRES_USER: ${HYPHA_WORKFLOW_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_WORKFLOW_DB_PASSWORD}
       POSTGRES_DB: myc_hypha_workflow
-
+    volumes:
+      - ./pg_workflow/data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
   hypha-workflow:
-    image: "mycesys/hypha-workflow:${IMAGE_VERSION}"
+    image: "mycesys/hypha-workflow:${HYPHA_WORKFLOW_VERSION}"
     container_name: hypha-workflow
+    restart: on-failure
     ports:
       - "8082:8082"
+    deploy:
+      resources:
+        limits:
+          memory: ${HYPHA_WORKFLOW_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HYPHA_WORKFLOW_LIMIT_MAX_RAM}
     environment:
-      - SPRING_R2DBC_URL=${SPRING_R2DBC_URL}
-      - SPRING_LIQUIBASE_URL=${SPRING_LIQUIBASE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SERVICE_FILES_URL=${SERVICE_FILES_URL}
-      - SERVICE_CORE_URL=${SERVICE_CORE_URL}
+      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-workflow-db:5432/myc_hypha_workflow
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-workflow-db:5432/myc_hypha_workflow
+    env_file:
+      - ./.env
     depends_on:
-      - hypha-workflow-db
+      hypha-workflow-db:
+        condition: service_healthy
+      vault:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

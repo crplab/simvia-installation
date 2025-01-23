@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   rabbitmq:
     container_name: "rabbitmq"
@@ -6,10 +5,19 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-    volumes:
-      - ./rabbitmq_data:/var/lib/rabbitmq/mnesia/
     ports:
       # AMQP protocol port
       - '5672:5672'
       # HTTP management UI
       - '15672:15672'
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+    env_file:
+      - ./.env

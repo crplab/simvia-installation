@@ -1,0 +1,27 @@
+services:
+  vault:
+    image: vault:1.13.3
+    container_name: vault
+    restart: always
+    ports:
+      - "8200:8200"
+      - "8201:8201"
+    environment:
+      VAULT_ADDR: 'https://0.0.0.0:8201'
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault_data:/data
+      - ./vault_config:/config
+    env_file:
+      - ./.env
+    command: sh /config/common/start-vault.sh
+    healthcheck:
+      test: 'if [ -z "$$(cat /data/status | grep "#VAULT_CONFIGURED#")" ]; then exit 1; fi'
+      interval: 2s
+      timeout: 5s
+      retries: 20
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

@@ -1,30 +1,47 @@
-version: '3.8'
 services:
   hypha-tasks-db:
     image: postgres:14.3-alpine
     container_name: hypha-tasks-db
     ports:
-      - "6464:5432"
+      - "6532:5432"
     environment:
-      POSTGRES_USER: tm
-      POSTGRES_PASSWORD: tm
+      POSTGRES_USER: ${HYPHA_TASK_MANAGER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_TASK_MANAGER_DB_PASSWORD}
       POSTGRES_DB: myc_hypha_tm
-
+    volumes:
+      - ./pg_tm/data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
   hypha-tasks:
-    image: "mycesys/hypha-tasks:${IMAGE_VERSION}"
+    image: "mycesys/hypha-tasks:${HYPHA_TASKS_VERSION}"
     container_name: hypha-tasks
+    restart: on-failure
     ports:
       - "8095:8095"
+    deploy:
+      resources:
+        limits:
+          memory: ${HYPHA_TASK_MANAGER_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HYPHA_TASK_MANAGER_LIMIT_MAX_RAM}
     environment:
-      - SPRING_R2DBC_URL=${SPRING_R2DBC_URL}
-      - SPRING_LIQUIBASE_URL=${SPRING_LIQUIBASE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
-      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
-      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
-      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
-      - SERVICE_FILES_URL=${SERVICE_FILES_URL}
-      - SERVICE_RESOURCE_URL=${SERVICE_RESOURCE_URL}
+      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-tasks-db:5432/myc_hypha_tm
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-tasks-db:5432/myc_hypha_tm
+    env_file:
+      - ./.env
     depends_on:
-      - hypha-tasks-db
+      hypha-tasks-db:
+        condition: service_healthy
+      vault:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

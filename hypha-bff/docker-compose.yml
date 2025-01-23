@@ -1,19 +1,47 @@
-version: '3.8'
 services:
+  hypha-bff-db:
+    image: postgres:14.3-alpine
+    container_name: hypha-bff-db
+    ports:
+      - "6436:5432"
+    environment:
+      POSTGRES_USER: ${HYPHA_BFF_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_BFF_DB_PASSWORD}
+      POSTGRES_DB: myc_hypha_bff
+    volumes:
+      - ./pg_bff/data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
   hypha-bff:
-    image: "mycesys/hypha-bff:${IMAGE_VERSION}"
+    image: "mycesys/hypha-bff:${HYPHA_BFF_VERSION}"
     container_name: hypha-bff
+    restart: on-failure
     ports:
       - "8100:8100"
+    deploy:
+      resources:
+        limits:
+          memory: ${HYPHA_BFF_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HYPHA_BFF_LIMIT_MAX_RAM}
     environment:
-      - SERVICE_FILES_URL=${SERVICE_FILES_URL}
-      - SERVICE_CORE_URL=${SERVICE_CORE_URL}
-      - SERVICE_WORKFLOW_URL=${SERVICE_WORKFLOW_URL}
-      - SERVICE_TASK_URL=${SERVICE_TASK_URL}
-      - SERVICE_RESOURCE_URL=${SERVICE_RESOURCE_URL}
-      - SERVICE_DASHBOARD_URL=${SERVICE_DASHBOARD_URL}
-      - SERVICE_AUTH_URL=${SERVICE_AUTH_URL}
-      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
-      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
-      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
-      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-bff-db:5432/myc_hypha_bff
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-bff-db:5432/myc_hypha_bff
+    env_file:
+      - ./.env
+    depends_on:
+      hypha-bff-db:
+        condition: service_healthy
+      vault:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

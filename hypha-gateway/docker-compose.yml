@@ -1,12 +1,20 @@
-version: '3.8'
 services:
   hypha-gateway:
-    image: "mycesys/hypha-gateway:${IMAGE_VERSION}"
+    image: "mycesys/hypha-gateway:${HYPHA_GATEWAY_VERSION}"
     container_name: hypha-gateway
+    restart: on-failure
     ports:
       - "8091:8091"
-    environment:
-      - OAUTH_ISSUER_URL=${OAUTH_ISSUER_URL}
-      - SERVICE_CORE_URL=${SERVICE_CORE_URL}
-      - SERVICE_FILES_URL=${SERVICE_FILES_URL}
-      - SERVICE_BFF_URL=${SERVICE_BFF_URL}
+    deploy:
+      resources:
+        limits:
+          memory: ${HYPHA_APP_GW_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HYPHA_APP_GW_LIMIT_MAX_RAM}
+    volumes:
+      - ${PWD}/ssl:/ssl
+    env_file:
+      - ./.env
+    depends_on:
+      vault:
+        condition: service_healthy

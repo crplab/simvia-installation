@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   hub-auth-db:
     image: postgres:14.3-alpine
@@ -6,23 +5,50 @@ services:
     ports:
       - "6431:5432"
     environment:
-      POSTGRES_USER: auth
-      POSTGRES_PASSWORD: auth
-      POSTGRES_DB: myc_auth
-
-  auth:
-    image: "mycesys/hub-auth:${IMAGE_VERSION}"
+      POSTGRES_USER: ${HUB_AUTH_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HUB_AUTH_DB_PASSWORD}
+      POSTGRES_DB: authdb
+    volumes:
+      - ./pg_auth/data:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+  hub-auth:
+    image: "mycesys/hub-auth:${HUB_AUTH_VERSION}"
     container_name: hub-auth
+    restart: on-failure
     ports:
       - "8098:8098"
+    deploy:
+      resources:
+        limits:
+          memory: ${HUB_AUTH_LIMIT_MAX_RAM}
+        reservations:
+          memory: ${HUB_AUTH_LIMIT_MAX_RAM}
+    volumes:
+      - ${PWD}/oauth/keys:/oauth/keys
+      - ${PWD}/auth/user/avatars:/server/data/avatars
+      - ${PWD}/licenses:/licenses
+      - ${PWD}/ssl:/ssl
     environment:
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - OAUTH_ISSUER_URL=${OAUTH_ISSUER_URL}
-      - WEB_APP_REDIRECT_URL=${WEB_APP_REDIRECT_URL}
-      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://hub-auth-db:5432/authdb
+      - USER_AVATARS_PATH=/server/data/avatars/
+      - OAUTH_KEYS_PATH=/oauth/keys/
+      - LICENSES_PATH=/licenses
+    env_file:
+      - ./.env
     depends_on:
-      - hub-auth-db
+      hub-auth-db:
+        condition: service_healthy
+      vault:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"

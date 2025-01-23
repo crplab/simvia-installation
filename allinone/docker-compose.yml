@@ -1,524 +1,59 @@
-version: '3.8'
-services:
-  consul:
-    image: consul:1.15.4
-    container_name: consul
-    ports:
-      - "8500:8500"
-    volumes:
-      - ./consul_config:/consul_config
-    command: sh /consul_config/start-consul.sh
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+# version: '3.8'
+# services:
 
-  vault:
-    image: vault:1.13.3
-    container_name: vault
-    restart: always
-    ports:
-      - "8200:8200"
-      - "8201:8201"
-    environment:
-      VAULT_ADDR: 'https://0.0.0.0:8201'
-    cap_add:
-      - IPC_LOCK
-    volumes:
-      - ./vault_data:/data
-      - ./vault_config:/config
-    command: sh /config/common/start-vault.sh
-    env_file:
-      - ./.env
-    healthcheck:
-      test: 'if [ -z "$$(cat /data/status | grep "#VAULT_CONFIGURED#")" ]; then exit 1; fi'
-      interval: 2s
-      timeout: 5s
-      retries: 20
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+include:
+  # Consul
+  - path: ../consul/docker-compose.yml
+    project_directory: ../allinone
 
-  rabbitmq:
-    container_name: "rabbitmq"
-    image: rabbitmq:3.10.7-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
-    ports:
-      # AMQP protocol port
-      - '5672:5672'
-      # HTTP management UI
-      - '15672:15672'
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Vault
+  - path: ../vault/docker-compose.yml
+    project_directory: ../allinone
 
-  hub-auth-db:
-    image: postgres:14.3-alpine
-    container_name: hub-auth-db
-    ports:
-      - "6431:5432"
-    environment:
-      POSTGRES_USER: ${HUB_AUTH_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HUB_AUTH_DB_PASSWORD}
-      POSTGRES_DB: authdb
-    volumes:
-      - ./pg_auth/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # RabbitMQ
+  - path: ../rabbitmq/docker-compose.yml
+    project_directory: ../allinone
 
-  hub-auth:
-    image: "mycesys/hub-auth:${HUB_AUTH_VERSION}"
-    container_name: hub-auth
-    restart: on-failure
-    ports:
-      - "8098:8098"
-    deploy:
-      resources:
-        limits:
-          memory: ${HUB_AUTH_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HUB_AUTH_LIMIT_MAX_RAM}
-    volumes:
-      - ./oauth/keys:/oauth/keys
-      - ./auth/user/avatars:/server/data/avatars
-      - ./licenses:/licenses
-      - ${PWD}/ssl:/ssl
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://hub-auth-db:5432/authdb
-      - USER_AVATARS_PATH=/server/data/avatars/
-      - OAUTH_KEYS_PATH=/oauth/keys/
-      - LICENSES_PATH=/licenses
-    depends_on:
-      hub-auth-db:
-        condition: service_healthy
-      vault:
-          condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hub Auth
+  - path: ../hub-auth/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-files-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-files-db
-    ports:
-      - "6632:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_FILES_MANAGER_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_FILES_MANAGER_DB_PASSWORD}
-      POSTGRES_DB: fmdb
-    volumes:
-      - ./pg_fm/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Files
+  - path: ../hypha-files/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-files:
-    image: "mycesys/hypha-files:${HYPHA_FILES_VERSION}"
-    container_name: hypha-files
-    restart: on-failure
-    ports:
-      - "8097:8097"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_FILES_MANAGER_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_FILES_MANAGER_LIMIT_MAX_RAM}
-    volumes:
-      - ./files/data:/server/data
-      - ./ssh/keys:/ssh/keys
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-files-db:5432/fmdb
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-files-db:5432/fmdb
-      - SSH_DEFAULT_KEY_PATH=/ssh/keys/hypha
-      - STORAGE_LOCAL_PATH=/server/data
-    depends_on:
-      hypha-files-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Resources
+  - path: ../hypha-resources/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-resources-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-resources-db
-    ports:
-      - "6432:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_RESOURCE_MANAGER_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_RESOURCE_MANAGER_DB_PASSWORD}
-      POSTGRES_DB: myc_hypha_rm
-    volumes:
-      - ./pg_rm/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Tasks
+  - path: ../hypha-tasks/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-resources:
-    image: "mycesys/hypha-resources:${HYPHA_RESOURCES_VERSION}"
-    container_name: hypha-resources
-    restart: on-failure
-    ports:
-      - "8096:8096"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_RESOURCE_MANAGER_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_RESOURCE_MANAGER_LIMIT_MAX_RAM}
-    volumes:
-      - ./ssh/keys:/ssh/keys
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-resources-db:5432/myc_hypha_rm
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-resources-db:5432/myc_hypha_rm
-      - SSH_DEFAULT_KEY_PATH=/ssh/keys/hypha
-    depends_on:
-      hypha-resources-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Core
+  - path: ../hypha-core/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-tasks-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-tasks-db
-    ports:
-      - "6532:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_TASK_MANAGER_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_TASK_MANAGER_DB_PASSWORD}
-      POSTGRES_DB: myc_hypha_tm
-    volumes:
-      - ./pg_tm/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Dashboard
+  - path: ../hypha-dashboard/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-tasks:
-    image: "mycesys/hypha-tasks:${HYPHA_TASKS_VERSION}"
-    container_name: hypha-tasks
-    restart: on-failure
-    ports:
-      - "8095:8095"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_TASK_MANAGER_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_TASK_MANAGER_LIMIT_MAX_RAM}
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-tasks-db:5432/myc_hypha_tm
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-tasks-db:5432/myc_hypha_tm
-    depends_on:
-      hypha-tasks-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Workflow
+  - path: ../hypha-workflow/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-core-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-core-db
-    ports:
-      - "6433:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_CORE_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_CORE_DB_PASSWORD}
-      POSTGRES_DB: coredb
-    volumes:
-      - ./pg_core/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha BFF
+  - path: ../hypha-bff/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-core:
-    image: "mycesys/hypha-core:${HYPHA_CORE_VERSION}"
-    container_name: hypha-core
-    restart: on-failure
-    ports:
-      - "8081:8081"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_CORE_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_CORE_LIMIT_MAX_RAM}
-    volumes:
-      - ./core/common/avatars:/server/data/avatars
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-core-db:5432/coredb
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-core-db:5432/coredb
-      - AVATAR_ROOT_DIR=/server/data/avatars
-    depends_on:
-      hypha-core-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha Gateway
+  - path: ../hypha-gateway/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-dashboard-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-dashboard-db
-    ports:
-      - "6435:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_DASHBOARD_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_DASHBOARD_DB_PASSWORD}
-      POSTGRES_DB: myc_hypha_dashboard
-    volumes:
-      - ./pg_dashboard/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hypha UI
+  - path: ../hypha-ui/docker-compose.yml
+    project_directory: ../allinone
 
-  hypha-dashboard:
-    image: "mycesys/hypha-dashboard:${HYPHA_DASHBOARD_VERSION}"
-    container_name: hypha-dashboard
-    restart: on-failure
-    ports:
-      - "8083:8083"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_DASHBOARD_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_DASHBOARD_LIMIT_MAX_RAM}
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-dashboard-db:5432/myc_hypha_dashboard
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-dashboard-db:5432/myc_hypha_dashboard
-    depends_on:
-      hypha-dashboard-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-workflow-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-workflow-db
-    ports:
-      - "6434:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_WORKFLOW_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_WORKFLOW_DB_PASSWORD}
-      POSTGRES_DB: myc_hypha_workflow
-    volumes:
-      - ./pg_workflow/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-workflow:
-    image: "mycesys/hypha-workflow:${HYPHA_WORKFLOW_VERSION}"
-    container_name: hypha-workflow
-    restart: on-failure
-    ports:
-      - "8082:8082"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_WORKFLOW_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_WORKFLOW_LIMIT_MAX_RAM}
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-workflow-db:5432/myc_hypha_workflow
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-workflow-db:5432/myc_hypha_workflow
-    depends_on:
-      hypha-workflow-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-bff-db:
-    image: postgres:14.3-alpine
-    container_name: hypha-bff-db
-    ports:
-      - "6436:5432"
-    environment:
-      POSTGRES_USER: ${HYPHA_BFF_DB_USERNAME}
-      POSTGRES_PASSWORD: ${HYPHA_BFF_DB_PASSWORD}
-      POSTGRES_DB: myc_hypha_bff
-    volumes:
-      - ./pg_bff/data:/var/lib/postgresql/data
-    healthcheck:
-      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
-      interval: 5s
-      timeout: 2s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-bff:
-    image: "mycesys/hypha-bff:${HYPHA_BFF_VERSION}"
-    container_name: hypha-bff
-    restart: on-failure
-    ports:
-      - "8100:8100"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_BFF_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_BFF_LIMIT_MAX_RAM}
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_R2DBC_URL=r2dbc:postgresql://hypha-bff-db:5432/myc_hypha_bff
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hypha-bff-db:5432/myc_hypha_bff
-    depends_on:
-      hypha-bff-db:
-        condition: service_healthy
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-gateway:
-    image: "mycesys/hypha-gateway:${HYPHA_GATEWAY_VERSION}"
-    container_name: hypha-gateway
-    restart: on-failure
-    ports:
-      - "8091:8091"
-    deploy:
-      resources:
-        limits:
-          memory: ${HYPHA_APP_GW_LIMIT_MAX_RAM}
-        reservations:
-          memory: ${HYPHA_APP_GW_LIMIT_MAX_RAM}
-    env_file:
-      - ./.env
-    volumes:
-      - ${PWD}/ssl:/ssl
-    depends_on:
-      vault:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hypha-ui:
-    container_name: hypha-ui
-    image: "mycesys/hypha-ui:${HYPHA_UI_VERSION}"
-    ports:
-      - '${HYPHA_PUBLIC_PORT}:443'
-    volumes:
-      #- /etc/letsencrypt_shared:/etc/letsencrypt
-      - ${PWD}/ssl_cert.conf:/etc/nginx/ssl_cert.conf
-      - ${PWD}/ssl:/etc/ssl
-    restart: always
-    environment:
-      CONSUL_HOST: ${CONSUL_HOST}
-      CONSUL_PORT: ${CONSUL_PORT}
-    depends_on:
-      - hub-auth
-      - hypha-gateway
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-
-  hub-ui:
-    container_name: hub-ui
-    image: "mycesys/hub-ui:${HUB_UI_VERSION}"
-    ports:
-      - '${HUB_PUBLIC_PORT}:3001'
-    volumes:
-      #- /etc/letsencrypt_shared:/etc/letsencrypt
-      - ${PWD}/ssl_cert.conf:/etc/nginx/ssl_cert.conf
-      - ${PWD}/ssl:/etc/ssl
-    restart: always
-    environment:
-      CONSUL_HOST: ${CONSUL_HOST}
-      CONSUL_PORT: ${CONSUL_PORT}
-    depends_on:
-      - hub-auth
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
+  # Hub UI
+  - path: ../hub-ui/docker-compose.yml
+    project_directory: ../allinone
