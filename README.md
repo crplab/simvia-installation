@@ -1,9 +1,9 @@
 ## Introduction
 
-Polimat is a SPDM system that allows to manage data and simulations, run computational tasks and process the results. This enterprise level system available for teams up to 5 users for free.
+Simvia is a SPDM system that allows to manage data and simulations, run computational tasks and process the results. This enterprise level system available for teams up to 5 users for free.
 
-- User guide: https://mycesys.com/hypha/2023.3/userguide.pdf
-- Installation guide: https://github.com/mycesys/hypha-installation
+- User guide: https://simvia.ru/release_docs/2024.1/userguide.pdf
+- Installation guide: https://github.com/crplab/simvia-installation
 - Docker images: https://hub.docker.com/u/mycesys
 
 ## Installation
