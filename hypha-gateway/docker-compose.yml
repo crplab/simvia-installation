@@ -5,6 +5,11 @@ services:
     restart: on-failure
     ports:
       - "8091:8091"
+    healthcheck:
+      test: curl -s http://localhost:8091/actuator/health| grep UP || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -16,5 +21,9 @@ services:
     env_file:
       - ./.env
     depends_on:
+      consul:
+        condition: service_started
       vault:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy

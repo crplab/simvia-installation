@@ -25,6 +25,11 @@ services:
     restart: on-failure
     ports:
       - "8095:8095"
+    healthcheck:
+      test: curl -s http://localhost:8095/actuator/health| grep UP || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 10
     deploy:
       resources:
         limits:
@@ -39,7 +44,11 @@ services:
     depends_on:
       hypha-tasks-db:
         condition: service_healthy
+      consul:
+        condition: service_started
       vault:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     logging:
       driver: "json-file"

@@ -25,6 +25,11 @@ services:
     restart: on-failure
     ports:
       - "8096:8096"
+    healthcheck:
+      test: curl -s http://localhost:8096/actuator/health| grep UP || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 10
     deploy:
       resources:
         limits:

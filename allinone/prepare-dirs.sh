@@ -11,5 +11,7 @@ mkdir -p pg_fm
 mkdir -p pg_rm
 mkdir -p pg_tm
 mkdir -p pg_workflow
-mkdir -p rabbitmq_data
+mkdir -p rabbitmq
 mkdir -p vault_data
+mkdir -p 3d_service/opt/models
+mkdir -p pg_3d_service/data

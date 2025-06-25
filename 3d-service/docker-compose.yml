@@ -1,0 +1,64 @@
+services:
+
+  3d-service-db:
+    image: postgres:14.3-alpine
+    container_name: 3d-service-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${HYPHA_3D_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_3D_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: 3dservicedb
+    volumes:
+      - ./pg_3d_service/data:/var/lib/postgresql/data
+    ports:
+      - 6432:5432
+    healthcheck:
+      test: "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || pg_isready"
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+
+  freecad:
+    image: mycesys/hypha-freecad-service:2025.1
+    container_name: 3d-service-freecad
+    restart: always
+    volumes:
+      - ./3d_service/opt/models:/opt/models
+    ports:
+      - 8000:8000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+
+  3d-service:
+    image: mycesys/hypha-ip-3d-requests-be:2025.1
+    container_name: 3d-service
+    restart: always
+    environment:
+      SPRING_MAX_FILE_SIZE: 2000MB
+      SPRING_MAX_REQUEST_SIZE: 2000MB
+      FREECAD_SERVICE_URL: ${HYPHA_3D_FREECAD_SERVICE_URL}
+      POSTGRES_URL: ${HYPHA_3D_SERVICE_POSTGRES_URL}
+      POSTGRES_USER: ${HYPHA_3D_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${HYPHA_3D_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: 3dservicedb
+    env_file:
+      - ./.env
+    depends_on:
+      3d-service-db:
+        condition: service_healthy
+    volumes:
+      - ./3d_service/opt/models:/opt/models
+    ports:
+      - 8080:8080
+      - 7000:7000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+

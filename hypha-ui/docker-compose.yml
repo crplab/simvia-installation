@@ -15,8 +15,10 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - hub-auth
-      - hypha-gateway
+      hub-auth:
+        condition: service_healthy
+      hypha-gateway:
+        condition: service_healthy
     healthcheck:
       test: curl --fail http://localhost || exit 1
       interval: 60s
