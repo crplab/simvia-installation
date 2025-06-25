@@ -2,7 +2,7 @@
 
 Simvia is a SPDM system that allows to manage data and simulations, run computational tasks and process the results. This enterprise level system available for teams up to 5 users for free.
 
-- User guide: https://simvia.ru/release_docs/latests/userguide.pdf
+- User guide: https://simvia.ru/release_docs/latest/userguide.pdf
 - Installation guide: https://github.com/crplab/simvia-installation
 - Docker images: https://hub.docker.com/u/mycesys
 
