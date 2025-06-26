@@ -19,7 +19,7 @@ show_help() {
   echo "Usage: $0 [OPTIONS]"
   echo
   echo "This script migrates from version 2024.1 to 2025.1."
-  echo "It downloads the new version of the installation script from [GitHub](https://github.com/mycesys/hypha-installation),"
+  echo "It downloads the new version of the installation script from [GitHub](https://github.com/crplab/simvia-installation),"
   echo "unzips it, and proceeds with the migration."
   echo
   echo "Options:"
@@ -96,12 +96,12 @@ echo "Running migration..."
 #### Copy new version of required files from new installation scripts
 
 for i in 3d-service hub-auth hub-ui hypha-bff hypha-core hypha-dashboard hypha-files hypha-gateway hypha-resources hypha-tasks hypha-ui hypha-workflow rabbitmq consul vault; do
-  cp -rf "$UNZIP_DIR"/hypha-installation-2025.1/$i/. ../$i
+  cp -rf "$UNZIP_DIR"/simvia-installation-2025.1/$i/. ../$i
 done
 
-cp "$UNZIP_DIR"/hypha-installation-2025.1/allinone/prepare-dirs.sh ./
-cp "$UNZIP_DIR"/hypha-installation-2025.1/allinone/docker-compose.yml ./
-cp -r "$UNZIP_DIR"/hypha-installation-2025.1/allinone/vault_config ./
+cp "$UNZIP_DIR"/simvia-installation-2025.1/allinone/prepare-dirs.sh ./
+cp "$UNZIP_DIR"/simvia-installation-2025.1/allinone/docker-compose.yml ./
+cp -r "$UNZIP_DIR"/simvia-installation-2025.1/allinone/vault_config ./
 
 #### Creating a backup for existing .env file
 
