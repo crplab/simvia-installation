@@ -1,6 +1,6 @@
 ## Introduction
 
-Simvia is a SPDM system that allows to manage data and simulations, run computational tasks and process the results. This enterprise level system available for teams up to 5 users for free.
+Simvia is an SPDM system that allows to manage data and simulations, run computational tasks and process the results. This enterprise level system available for teams up to 5 users for free.
 
 - User guide: https://simvia.ru/release_docs/latest/userguide.pdf
 - Installation guide: https://github.com/crplab/simvia-installation
@@ -19,7 +19,6 @@ Simvia is a SPDM system that allows to manage data and simulations, run computat
 -  [Generate and use self-signed SSL certificate](#generate-and-use-self-signed-ssl-certificate)
 -  [Install Hypha on several nodes](#install-hypha-on-several-nodes)
 4. [Technical details](#4-technical-details)
-- [Arсhitecture](#architecture)
 - [Directories](#list-of-directories)
 - [Environment configuration](#environment-configuration)
 5. [Troubleshooting](#5-troubleshooting)
@@ -31,7 +30,7 @@ Simvia is a SPDM system that allows to manage data and simulations, run computat
 
 ### 1. Requrements
 
-This is a recommended configuration for basic installation. If you need requirements based on your environment and team size please contact us by: [polimat@crplab.ru](mailto:polimat@crplab.ru).
+This is a recommended configuration for basic installation. If you need requirements based on your environment and team size please contact us by: [simvia@crplab.ru](mailto:simvia@crplab.ru).
 
 #### Hardware
 
@@ -43,24 +42,25 @@ This is a recommended configuration for basic installation. If you need requirem
 
 - Optimal
 
-| Node | CPU | RAM | Disk |
-| -------- | ------ | ------- | ------ |
-| All in one | 16 | 64 | 512 Gb |
-| Hub | 4 | 6 | 60 Gb |
+| Node        | CPU | RAM | Disk    |
+|-------------|-----|-----|---------|
+| All in one  | 12  | 64  | 512 Gb  |
+| Hub         | 4   | 16  | 60 Gb   |
 
 - Enterprise
 
-| Node | CPU | RAM | Disk |
-| -------- | ------ | ------- | ------ |
-| Hub | 4 | 16 | 60 Gb |
-| Core | 8 | 24 | 60 Gb |
-| Task manager | 8 | 16 | 60 Gb |
-| Resource manager| 8 | 16 | 60 Gb |
-| Workflow | 4 | 16 | 60 Gb |
-| BFF | 4 | 16 | 60 Gb |
-| Dashboard | 4 | 16 | 60 Gb |
-| Files | 4 | 24 | 512 Gb |
-| Gateway | 4 | 16 | 60 Gb |
+| Node             | CPU | RAM | Disk   |
+|------------------| ------ | ------- |--------|
+| Hub              | 4 | 16 | 60 Gb  |
+| Core             | 8 | 24 | 60 Gb  |
+| Task manager     | 8 | 16 | 60 Gb  |
+| Resource manager | 8 | 16 | 60 Gb  |
+| Workflow         | 4 | 16 | 60 Gb  |
+| BFF              | 4 | 16 | 60 Gb  |
+| Dashboard        | 4 | 16 | 60 Gb  |
+| Files            | 4 | 24 | 512 Gb |
+| Gateway          | 4 | 16 | 60 Gb  |
+| 3D service       | 4 | 16 | 128 Gb |
 
 #### Software
 
@@ -78,8 +78,10 @@ This is a recommended configuration for basic installation. If you need requirem
 #### Operating system
 - Theoretically system will run on any operating system that supports docker containers
 - We recommend to use one of this operating systems (tested for installation)
-  - CentOS 7
-  - CentOS 8
+  - RedOS
+  - AstraLinux
+  - AltLinux
+  - CentOS 7+
   - Ubuntu 20.04 or newer
 - Installation scripts are now available only for Unix-like operating systems
 
@@ -90,14 +92,14 @@ This is a recommended configuration for basic installation. If you need requirem
 #### Configuration
 
 - Docker images at Docker Hub: https://hub.docker.com/u/mycesys
-- Sample configuration & scripts: https://github.com/mycesys/hypha-installation
+- Sample configuration & scripts: https://github.com/crplab/simvia-installation
   - To download current repository content use this command (or clone it with `git`):
 
 ```bash
-wget https://github.com/crplab/polimat-installation/archive/refs/heads/main.zip
+wget https://github.com/crplab/simvia-installation/archive/refs/heads/main.zip
 ```
 
-**NEXT STEPS SHOULD BE EXECUTED IN `hypha-installation/allinone` directory**
+**NEXT STEPS SHOULD BE EXECUTED IN `./allinone` directory**
 
 ##### Prepare directories
 
@@ -145,12 +147,12 @@ cp ./dot.env.example ./.env
 - Required changes in `.env`
   - Redirect URLs
 
-  | Key=Value | Description |
-  | ------ | ----------------- |
-  | `HUB_PUBLIC_URL=hypha.yourdomain.com` | place here public address (IP or domain name) of hub instance |
-  | `HUB_PUBLIC_PORT=8301` | port for Hub interface |
-  | `HYPHA_PUBLIC_URL=hypha.yourdomain.com` | place here public address (IP or domain name) of hypha instance |
-  | `HYPHA_PUBLIC_PORT=8300` | port for Hypha interface |
+  | Key=Value                                | Description |
+  |------------------------------------------| ----------------- |
+  | `HUB_PUBLIC_URL=simvia.yourdomain.com`   | place here public address (IP or domain name) of hub instance |
+  | `HUB_PUBLIC_PORT=8301`                   | port for Hub interface |
+  | `HYPHA_PUBLIC_URL=simvia.yourdomain.com` | place here public address (IP or domain name) of hypha instance |
+  | `HYPHA_PUBLIC_PORT=8300`                 | port for Hypha interface |
 
   - **NOTE: If you are going to use standard HTTP ports (80 for HTTP and 443 for HTTPS), please set the URLs manually without specifying the port (e.g., ':80' or ':443'), as browsers automatically omit the port in such cases. Parameters described above should be set in any case, sorry for the inconvenience**
   - You should set proper version number for each service. You can check latest versions from [docker hub](https://hub.docker.com/u/mycesys)
@@ -180,35 +182,14 @@ docker compose up -d
   - Use `admin@mycesys.com` as a login
   - Use `root` as password (if you did not change it in `.env` during the installation process)
 - After successful login you will be redirected to Dashboard page
-- To learn how to create models, run workflows and more, please take a look at the [user guide](https://mycesys.com/hypha/2023.1/userguide.pdf). If you encounter any errors, check our [Troubleshooting](#5-troubleshooting) section.
-- In this version of the system (2023.2) some administration actions could be done only with direct API call. You can find bash scripts for this actions in `scripts` directory in this repository or [download them from site](https://mycesys.com/hypha/2023.1/adm_scripts.tar.gz):
-- Extent your license (to obtain a license file please contact us using our website www.crplab.ru)
-
- ```bash
- scripts/hub-add_license_users.sh
- ```
-
- ```bash
- scripts/hub-add_license_support.sh
- ```
-
-- Change password settings
-
- ```bash
- scripts/hub-update_password_format.sh
- ```
-
-- Change confirmation lifetime
-
-```bash
-scripts/hub-update_confirmation_lifetime.sh
-```
+- To learn how to create models, run workflows and more, please take a look at the [user guide](https://simvia.ru/release_docs/latest/userguide.pdf). If you encounter any errors, check our [Troubleshooting](#5-troubleshooting) section.
+- Extent your license (to obtain a license file please contact us using our website www.simvia.ru)
 
 ### 3. Advanced guide
 
 #### Generate and use self-signed SSL certificate
 
-You can obtain SSL certificate for your DNS record or IP address and use it to secure network conenctions for free without CA (certificate authority).
+You can obtain SSL certificate for your DNS record or IP address and use it to secure network connections for free without CA (certificate authority).
 
 **Advantages**
 - Free long term SSL certificate
@@ -217,7 +198,7 @@ You can obtain SSL certificate for your DNS record or IP address and use it to s
 
 **Disadvantages**
 - Browser will ask for confirmation
-- Additional steps in installation process required
+- Additional steps during installation process
 
 ##### How to obtain the certificate
 
@@ -233,11 +214,11 @@ cp selfsigned/v3.ext ssl/
 ```
 
 - Fill `ssl/ssl.cfg` with your server parameters
-        - `C = US` - country code
-        - `ST = State` - state
-        - `L = City` - your city
-        - `O = Org LLC` - your organization
-        - `OU = Org Unit` - your organization unit
+        - `C = RU` - country code
+        - `ST = St.Petersburg` - state
+        - `L = St.Petersburg` - your city
+        - `O = CRPLab` - your organization
+        - `OU = Engineering` - your organization unit
         - `CN = example.com` - Common Name: set your server FQDN or IP address here
 - Fill `ssl/v3.ext` with your server parameters
   - `subjectAltName = IP:value,DNS:value` - place comma separated pairs `IP:<ip address>` or `DNS:<DNS name>` corresponding to your server
@@ -250,7 +231,7 @@ cp selfsigned/v3.ext ssl/
 
 ##### Additional steps
 
-**After running all containers add SSL certificate to `hub-auth` and `hypha-gateway` JKS keystores**
+**Generated SSL certificate must be added to `hub-auth` and `hypha-gateway` JKS keystores**
 
 - Run the following script:
 ```bash
@@ -262,15 +243,11 @@ cp selfsigned/v3.ext ssl/
 #### Install Hypha on several nodes
 
 - You can spread system components on nodes
-- To do it you can use docker composes from `hypha-installation` to install each component separately
-- In this case ensure that you properly set services URLs in each `.env` file (in the next version of Hypha this will be not neccessary)
-- We recommend to start with separating `Hub` components because `Hub` is completely independent service
+- To do it you can use docker compose configuration files from `simvia-installation/` directory to install each component separately
+- In this case ensure that you properly set consul URL
+- We recommend to start with separating `Hub` components
 
 ### 4. Technical details
-
-####  Architecture
-
-![All in one installation scheme](https://mycesys.com/hypha/2023.1/hypha-hub_allinone_scheme.png)
 
 #### List of directories
 
@@ -280,18 +257,19 @@ cp selfsigned/v3.ext ssl/
 | `core/common/avatars/` | place where avatars for all other objects are stored                                                                   |
 | `files/data/`          | place where all main data is stored (models, simulation results etc). Usually these files take a large amount of space |
 | `oauth/keys/`          | place for RSA keys used in OAuth2 authentication process                                                               |
-| `ssh/keys/`            | place for SSH-keys for all computational clusters                                                                      |
 | `ssl/`                 | place for SSL certificates for HTTPS support                                                                           |
 | `pg_auth`              | PostgreSQL data directory for authentication service (Hub)                                                             |
+| `pg_3d_service`        | PostgreSQL data directory for 3d models service                                                                        |
 | `pg_core`              | PostgreSQL data directory for core service                                                                             |
 | `pg_dashboard`         | PostgreSQL data directory for dashboard service                                                                        |
 | `pg_fm`                | PostgreSQL data directory for files management service                                                                 |
 | `pg_rm`                | PostgreSQL data directory for resources management service                                                             |
 | `pg_tm`                | PostgreSQL data directory for tasks management service                                                                 |
 | `pg_workflow`          | PostgreSQL data directory for workflow management service                                                              |
-| `rabbitmq_data`        | RabbitMQ directory for persistent data                                                                                 |
+| `rabbitmq`             | RabbitMQ directory for persistent data                                                                                 |
 | `consul_data`          | HashiCorp Consul directory for persistent data                                                                         |
 | `vault_data`           | HashiCorp Vault directory for persistent data                                                                          |
+| `vault_config`         | HashiCorp Vault directory for configuration                                                                            |
 
 #### Environment configuration
 
@@ -309,17 +287,17 @@ cp selfsigned/v3.ext ssl/
 
 - Email Notifications
 
-  | Key=Value | Description                                         |
-  |-----------------------------------------------------| ----------------- |
-  | `HUB_AUTH_MAIL_SERVER_HOST`=smtp.gmail.com | mail server host                                    |
-  | `HUB_AUTH_MAIL_SERVER_POST`=587  | mail server port                                    |
-  | `HUB_AUTH_MAIL_USERNAME`=no-reply@mycesys.com | user name (email address) of the mail account       |
-  | `HUB_AUTH_MAIL_PASSWORD`=secret | user password (or token) of the mail account        |
-  | `HUB_AUTH_MAIL_PROTOCOL`=smtp  | protocol used for emails transferring               |
-  | `HUB_AUTH_MAIL_SMTP_AUTH`=true | use mail account authentication                     |
-  | `HUB_AUTH_MAIL_TLS_ENABLE`=true | use TLS protocol                                    |
-  | `HUB_AUTH_MAIL_SSL_ENABLE`=false  | use SSL protocol                                    |
-  | `HUB_AUTH_MAIL_FROM`=no-reply@mycesys.com | email address from which notifications will be sent |
+  | Key=Value                                    | Description                                        |
+  |----------------------------------------------|----------------------------------------------------|
+  | `HUB_AUTH_MAIL_SERVER_HOST`=smtp.gmail.com   | mail server host                                   |
+  | `HUB_AUTH_MAIL_SERVER_POST`=587              | mail server port                                   |
+  | `HUB_AUTH_MAIL_USERNAME`=no-reply@crplab.org | user name (email address) of the mail account      |
+  | `HUB_AUTH_MAIL_PASSWORD`=secret              | user password (or token) of the mail account       |
+  | `HUB_AUTH_MAIL_PROTOCOL`=smtp                | protocol used for emails transferring              |
+  | `HUB_AUTH_MAIL_SMTP_AUTH`=true               | use mail account authentication                    |
+  | `HUB_AUTH_MAIL_TLS_ENABLE`=true              | use STARTLS protocol                               |
+  | `HUB_AUTH_MAIL_SSL_ENABLE`=false             | use SSL protocol                                   |
+  | `HUB_AUTH_MAIL_FROM`=no-reply@crplab.org     | email address from which notifications will be sent |
 
 
 ### 5. Troubleshooting
@@ -371,7 +349,7 @@ Caused by: java.security.cert.CertificateException: No subject alternative names
     - Find `Certificate -> Extension -> Certificate Subject Alternative Name`
     - This section should exits
     - DNS names or IPs should refer to your server DNS/IP
-- Symptom: HTTP requests with `500` status code, exeptions in logs like:
+- Symptom: HTTP requests with `500` status code, exceptions in logs like:
 
 ```
 org.springframework.security.oauth2.jwt.JwtDecoderInitializationException: Failed to lazily resolve the supplied JwtDecoder instance
@@ -419,7 +397,7 @@ iptables -t nat -A POSTROUTING --source yyy.yyy.yyy.yyy  --destination xxx.xxx.x
 
 **Update version**
 
-1. Download `config-migration_2023.1-2-2023.2.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2023.2/allinone/)
+1. Download `config-migration_2023.1-2-2023.2.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2023.2/allinone/)
 2. Run migration script
 - Run script `config-migration_2023.1-2-2023.2.sh` in `./allinone` directory
 
@@ -456,7 +434,7 @@ docker compose up -d
 
 **Update version**
 
-1. Download `config-migration_2023.2-2-2023.23.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2023.3/allinone/)
+1. Download `config-migration_2023.2-2-2023.23.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2023.3/allinone/)
 2. Run migration script
 - Run script `config-migration_2023.2-2-2023.3.sh` in `./allinone` directory
 
@@ -487,7 +465,7 @@ If you are using selfsigned certificates:
 
 **Update version**
 
-1. Download `config-migration_2023.3-2-2024.1.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2024.1/allinone/)
+1. Download `config-migration_2023.3-2-2024.1.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2024.1/allinone/)
 2. Run migration script
 - Run script `config-migration_2023.2-2-2023.3.sh` in `./allinone` directory
 
@@ -495,7 +473,7 @@ If you are using selfsigned certificates:
 ./config-migration_2023.3-2-2024.1.sh
 ```
 - Please check new `.env` file generated by script before start. Set new versions for services, you can get them from https://hub.docker.com/u/mycesys. Check if new variables `DISCOVERY_PREFER_IP` and `DISCOVERY_IP_ADDRESS` are presented 
-- Now `docker-compose.yml` is splitted by serices. Please check new `docker-compose.yml` file before start. If you made any changes during the installation of previous version, please sync them with new version of this file.
+- Now `docker-compose.yml` is splitted by services. Please check new `docker-compose.yml` file before start. If you made any changes during the installation of previous version, please sync them with new version of this file.
 - Please use new `ssl_cert.conf` file for SSL/TLS certificates setup.
 
 3. To update images and restart system run:
@@ -518,7 +496,7 @@ If you are using selfsigned certificates:
 
 **Update version**
 
-1. Download `config-migration_2024.1-2025.1.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2025.1/allinone/)
+1. Download `config-migration_2024.1-2025.1.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2025.1/allinone/)
 2. Run migration script
 - Run script `config-migration_2024.1-2025.1.sh` in `./allinone` directory
 
