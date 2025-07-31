@@ -61,3 +61,7 @@ include:
   # 3D Service
   - path: ../3d-service/docker-compose.yml
     project_directory: ../allinone
+
+  # Hypha Backend Dictionary
+  - path: ../hypha-backend-dictionary/docker-compose.yml
+    project_directory: ../allinone
