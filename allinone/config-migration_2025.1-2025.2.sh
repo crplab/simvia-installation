@@ -19,7 +19,7 @@ show_help() {
   echo "Usage: $0 [OPTIONS]"
   echo
   echo "This script migrates from version 2025.1 to 2025.2."
-  echo "It downloads the new version of the installation script from [GitHub](https://github.com/mycesys/hypha-installation),"
+  echo "It downloads the new version of the installation script from [GitHub](https://github.com/crplab/simvia-installation),"
   echo "unzips it, and proceeds with the migration."
   echo
   echo "Options:"
@@ -117,12 +117,12 @@ echo "Backup environment file: $backupenvfile successfully created"
 
 {
   echo "STL_SERVICE_BASE_URL=http://3d-service:8080/rest/v1/models"
-  echo "HYPHA_WEB_APP_BRANDING_TITLE=Hypha"
-  echo "HYPHA_WEB_APP_BRANDING_PREFIX=hypha"
-  echo "HUB_WEB_APP_BRANDING_TITLE=Hub"
-  echo "GLOBAL_WEB_APP_BRANDING_TITLE=Mycesys"
-  echo "USERGUIDE_URL=https://mycesys.com/hypha/latest/userguide.pdf"
-  echo "DEFAULT_SYSTEM_LANGUAGE=en"
+  echo "HYPHA_WEB_APP_BRANDING_TITLE=Симвиа"
+  echo "HYPHA_WEB_APP_BRANDING_PREFIX=simvia"
+  echo "HUB_WEB_APP_BRANDING_TITLE=Хаб"
+  echo "GLOBAL_WEB_APP_BRANDING_TITLE=ЦРП"
+  echo "USERGUIDE_URL=https://simvia.ru/release_docs/latest/userguide.pdf"
+  echo "DEFAULT_SYSTEM_LANGUAGE=ru"
   echo "HYPHA_BACKEND_DICTIONARY_VERSION=2025.2.19"
 
 } >> ${env_file}
