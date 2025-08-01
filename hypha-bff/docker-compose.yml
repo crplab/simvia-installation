@@ -44,6 +44,8 @@ services:
     depends_on:
       hypha-bff-db:
         condition: service_healthy
+      hypha-backend-dictionary:
+        condition: service_healthy
       consul:
         condition: service_started
       vault:
