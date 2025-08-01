@@ -13,11 +13,11 @@ Simvia is an SPDM system that allows to manage data and simulations, run computa
 1. [Requirements](#1-requrements)
 2. [Installation](#2-installation-all-in-one)
  - [Configuration](#configuration)
- - [Run Hypha & Hub](#run-hypha--hub)
+ - [Run Simvia & Hub](#run-simvia--hub)
  - [First steps](#first-steps)
 3. [Advanced guide](#3-advanced-guide)
 -  [Generate and use self-signed SSL certificate](#generate-and-use-self-signed-ssl-certificate)
--  [Install Hypha on several nodes](#install-hypha-on-several-nodes)
+-  [Install Simvia on several nodes](#install-simvia-on-several-nodes)
 4. [Technical details](#4-technical-details)
 - [Directories](#list-of-directories)
 - [Environment configuration](#environment-configuration)
@@ -28,7 +28,6 @@ Simvia is an SPDM system that allows to manage data and simulations, run computa
 - [2023.4 to 2024.1](#20233-to-20241)
 - [2024.1 to 2025.1](#20241-to-20251)
 - [2025.1 to 2025.2](#20251-to-20252)
-
 
 ### 1. Requrements
 
@@ -89,7 +88,7 @@ This is a recommended configuration for basic installation. If you need requirem
 
 ### 2. Installation (All in one)
 
-**NOTE:** if you already have an installed version of Hypha please check the [Update section](#6-update-existing-installation) of this guide.
+**NOTE:** if you already have an installed version of Simvia please check the [Update section](#6-update-existing-installation) of this guide.
 
 #### Configuration
 
@@ -153,8 +152,8 @@ cp ./dot.env.example ./.env
   |------------------------------------------| ----------------- |
   | `HUB_PUBLIC_URL=simvia.yourdomain.com`   | place here public address (IP or domain name) of hub instance |
   | `HUB_PUBLIC_PORT=8301`                   | port for Hub interface |
-  | `HYPHA_PUBLIC_URL=simvia.yourdomain.com` | place here public address (IP or domain name) of hypha instance |
-  | `HYPHA_PUBLIC_PORT=8300`                 | port for Hypha interface |
+  | `HYPHA_PUBLIC_URL=simvia.yourdomain.com` | place here public address (IP or domain name) of Simvia instance |
+  | `HYPHA_PUBLIC_PORT=8300`                 | port for Simvia interface |
 
   - **NOTE: If you are going to use standard HTTP ports (80 for HTTP and 443 for HTTPS), please set the URLs manually without specifying the port (e.g., ':80' or ':443'), as browsers automatically omit the port in such cases. Parameters described above should be set in any case, sorry for the inconvenience**
   - You should set proper version number for each service. You can check latest versions from [docker hub](https://hub.docker.com/u/mycesys)
@@ -162,7 +161,7 @@ cp ./dot.env.example ./.env
 
 **For all-in-one installation <HYPHA_PUBLIC_URL> and <HUB_PUBLIC_URL> could be the same but ports should be different.**
 
-#### Run Hypha & Hub
+#### Run Simvia & Hub
 
 - To start the system run following scripts:
 
@@ -242,7 +241,7 @@ cp selfsigned/v3.ext ssl/
 - **NOTE:** If you did not use the `generate-ssl-keys.sh` script to create SSL certificates, be sure to set the correct passphrase for the private key in the `PASSPHRASE` variable within the `add-ssl-keys-to-jdk.sh` script.
 
 
-#### Install Hypha on several nodes
+#### Install Simvia on several nodes
 
 - You can spread system components on nodes
 - To do it you can use docker compose configuration files from `simvia-installation/` directory to install each component separately
@@ -369,7 +368,7 @@ curl -k --location --request GET https://<HUB_URL>/oauth2/jwks
   - If it fails than you need some routing configuration to make it working fine
   - Here is an example:
 
-![Environment scheme](https://mycesys.com/hypha/2023.1/2023_1_issue_network_routing.png)
+![Environment scheme]()
 
   - On this scheme all `Connections` should work properly
   - To allow connections from VM to `Public interface` you should add following rules (iptables):
@@ -527,7 +526,7 @@ If you are using selfsigned certificates:
 
 **Update version**
 
-1. Download `config-migration_2025.1-2025.2.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2025.2/allinone/)
+1. Download `config-migration_2025.1-2025.2.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2025.2/allinone/)
 2. Run migration script
 - Run script `config-migration_2025.1-2025.2.sh` in `./allinone` directory
 
