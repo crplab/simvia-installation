@@ -3,4 +3,4 @@ rabbitmq.password=${RABBITMQ_PASSWORD}
 db.user=${HYPHA_TASK_MANAGER_DB_USERNAME}
 db.password=${HYPHA_TASK_MANAGER_DB_PASSWORD}
 security.jwt.internal.secret=${HYPHA_SECRET}
-
+security.jwt.auth.secret=${HUB_AUTH_SECRET}
