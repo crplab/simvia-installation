@@ -96,12 +96,13 @@ echo "Running migration..."
 #### Copy new version of required files from new installation scripts
 
 for i in 3d-service hub-auth hub-ui hypha-backend-dictionary hypha-bff hypha-core hypha-dashboard hypha-files hypha-gateway hypha-resources hypha-tasks hypha-ui hypha-workflow rabbitmq consul vault; do
-  \cp -rf "$UNZIP_DIR"/hypha-installation-2025.2/$i/. ../$i
+  \cp -rf "$UNZIP_DIR"/simvia-installation-2025.2/$i/. ../$i
 done
 
-cp "$UNZIP_DIR"/hypha-installation-2025.2/allinone/prepare-dirs.sh ./
-cp "$UNZIP_DIR"/hypha-installation-2025.2/allinone/docker-compose.yml ./
-cp -r "$UNZIP_DIR"/hypha-installation-2025.2/allinone/vault_config ./
+cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/prepare-dirs.sh ./
+cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/docker-compose.yml ./
+cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/licenses/support.default ./licenses/support.default
+cp -r "$UNZIP_DIR"/simvia-installation-2025.2/allinone/vault_config ./
 
 #### Creating a backup for existing .env file
 
@@ -127,7 +128,7 @@ echo "Backup environment file: $backupenvfile successfully created"
 
 } >> ${env_file}
 
-sed -i s/dev/prod/ ${env_file}
+sed -i s/PROFILE\=dev/PROFILE\=prod/ ${env_file}
 
 echo "Migration completed. Checking generated environment file..."
 
