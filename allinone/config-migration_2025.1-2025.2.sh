@@ -103,6 +103,7 @@ cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/prepare-dirs.sh ./
 cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/docker-compose.yml ./
 cp "$UNZIP_DIR"/simvia-installation-2025.2/allinone/licenses/support.default ./licenses/support.default
 cp -r "$UNZIP_DIR"/simvia-installation-2025.2/allinone/vault_config ./
+cp -r "$UNZIP_DIR"/simvia-installation-2025.2/allinone/favicon_simvia.ico ./favicon_simvia.ico
 
 #### Creating a backup for existing .env file
 
