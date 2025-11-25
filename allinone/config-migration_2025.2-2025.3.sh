@@ -5,7 +5,7 @@
 set -e
 
 # Default URL of the installation script on GitHub
-GITHUB_URL="https://github.com/crplab/simvia-installation/archive/refs/heads/2025.3-test.zip"
+GITHUB_URL="https://github.com/crplab/simvia-installation/archive/refs/heads/2025.3.zip"
 
 NEW_VERSION_SOURCES=2025.3_"$(date '+%s')"
 
@@ -95,15 +95,15 @@ echo "Running migration..."
 
 #### Copy new version of required files from new installation scripts
 
-for i in 3d-service hub-auth hub-ui hypha-backend-dictionary hypha-bff hypha-core hypha-dashboard hypha-files hypha-gateway hypha-resources hypha-tasks hypha-ui hypha-workflow rabbitmq consul vault; do
-  \cp -rf "$UNZIP_DIR"/simvia-installation-2025.3-test/$i/. ../$i
+for i in hypha-tags vault; do
+  \cp -rf "$UNZIP_DIR"/simvia-installation-2025.3/$i/. ../$i
 done
 
-cp "$UNZIP_DIR"/simvia-installation-2025.3-test/allinone/prepare-dirs.sh ./
-cp "$UNZIP_DIR"/simvia-installation-2025.3-test/allinone/docker-compose.yml ./
-cp "$UNZIP_DIR"/simvia-installation-2025.3-test/allinone/licenses/support.default ./licenses/support.default
-cp -r "$UNZIP_DIR"/simvia-installation-2025.3-test/allinone/vault_config ./
-cp -r "$UNZIP_DIR"/simvia-installation-2025.3-test/allinone/favicon_simvia.ico ./favicon_simvia.ico
+cp "$UNZIP_DIR"/simvia-installation-2025.3/allinone/prepare-dirs.sh ./
+cp "$UNZIP_DIR"/simvia-installation-2025.3/allinone/docker-compose.yml ./
+cp "$UNZIP_DIR"/simvia-installation-2025.3/allinone/licenses/support.default ./licenses/support.default
+cp -r "$UNZIP_DIR"/simvia-installation-2025.3/allinone/vault_config ./
+cp -r "$UNZIP_DIR"/simvia-installation-2025.3/allinone/favicon_simvia.ico ./favicon_simvia.ico
 
 #### Creating a backup for existing .env file
 
@@ -141,7 +141,7 @@ echo "HUB_WEB_APP_BRANDING_TITLE=Хаб"
 echo "GLOBAL_WEB_APP_BRANDING_TITLE=ЦРП"
 printf '\n'
 echo "DEFAULT_SYSTEM_LANGUAGE=ru"
-echo "DEFAULT_SUPERADMIN_EMAIL=admin@crplab.ru"
+echo "DEFAULT_SUPER_ADMIN_EMAIL=admin@crplab.ru"
 printf '\n'
 echo "USERGUIDE_URL=https://simvia.ru/release_docs/latest/userguide.pdf"
 echo "HUB_PRODUCT_PRICE_URL=https://simvia.ru/pricing"
@@ -156,19 +156,19 @@ printf '\n'
 echo "DISCOVERY_PREFER_IP=false"
 echo "DISCOVERY_IP_ADDRESS="
 printf '\n'
-echo "HYPHA_CORE_VERSION=2025.3.6"
-echo "HYPHA_FILES_VERSION=2025.3.4"
-echo "HYPHA_GATEWAY_VERSION=2025.3.3"
-echo "HYPHA_BFF_VERSION=2025.3.8"
-echo "HYPHA_WORKFLOW_VERSION=2025.3.7"
-echo "HYPHA_RESOURCES_VERSION=2025.3.11"
+echo "HYPHA_CORE_VERSION=2025.3.5"
+echo "HYPHA_FILES_VERSION=2025.3.3"
+echo "HYPHA_GATEWAY_VERSION=2025.3.4"
+echo "HYPHA_BFF_VERSION=2025.3.16"
+echo "HYPHA_WORKFLOW_VERSION=2025.3.4"
+echo "HYPHA_RESOURCES_VERSION=2025.3.10"
 echo "HYPHA_TASKS_VERSION=2025.3.3"
-echo "HYPHA_DASHBOARD_VERSION=2025.3.2"
-echo "HYPHA_UI_VERSION=2025.3.55"
-echo "HUB_AUTH_VERSION=2025.3.16"
-echo "HUB_UI_VERSION=2025.3.55"
-echo "HYPHA_BACKEND_DICTIONARY_VERSION=2025.3.19"
-echo "HYPHA_TAGS_VERSION=2025.3.4"
+echo "HYPHA_DASHBOARD_VERSION=2025.3.3"
+echo "HYPHA_UI_VERSION=2025.3.77"
+echo "HUB_AUTH_VERSION=2025.3.11"
+echo "HUB_UI_VERSION=2025.3.77"
+echo "HYPHA_BACKEND_DICTIONARY_VERSION=2025.3.7"
+echo "HYPHA_TAGS_VERSION=2025.3.5"
 printf '\n'
 echo "HUB_AUTH_MAIL_SERVER_HOST=$HUB_AUTH_MAIL_SERVER_HOST"
 echo "HUB_AUTH_MAIL_SERVER_POST=$HUB_AUTH_MAIL_SERVER_POST"
