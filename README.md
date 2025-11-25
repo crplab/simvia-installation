@@ -78,13 +78,10 @@ This is a recommended configuration for basic installation. If you need requirem
         - If you don't have one you can get it for free from https://letsencrypt.org/ or use self-signed
 
 #### Operating system
-- Theoretically system will run on any operating system that supports docker containers
-- We recommend to use one of this operating systems (tested for installation)
+- Any operating system that supports docker containers
+- We recommend to use one of this operating systems:
   - RedOS
   - AstraLinux
-  - AltLinux
-  - CentOS 7+
-  - Ubuntu 20.04 or newer
 - Installation scripts are now available only for Unix-like operating systems
 
 ### 2. Installation (All in one)
