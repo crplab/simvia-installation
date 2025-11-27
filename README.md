@@ -11,7 +11,9 @@ Simvia is an SPDM system that allows to manage data and simulations, run computa
 ### Table of content
 
 1. [Requirements](#1-requrements)
-2. [Installation](#2-installation-all-in-one)
+2. [Installation](#2-installation-with-simvia-installer)
+2.1 [Update with Simvia Installer](#2-1-update-with-simvia-installer) 
+2.2. [Manual installation (All in one)](#2-1-manual-installation-all-in-one)
  - [Configuration](#configuration)
  - [Run Simvia & Hub](#run-simvia--hub)
  - [First steps](#first-steps)
@@ -84,7 +86,44 @@ This is a recommended configuration for basic installation. If you need requirem
   - AstraLinux
 - Installation scripts are now available only for Unix-like operating systems
 
-### 2. Installation (All in one)
+### 2. Installation with Simvia Installer
+ You can use step-by-steb web-based installer to install Simvia
+
+Requirements: 
+- `docker` ([Official installation guide](https://docs.docker.com/engine/install/))
+- `docker compose` ([Official installation guide](https://docs.docker.com/compose/install/linux/))
+
+How to run:
+
+If you need a new installation of Simvia you must run
+
+```
+HYPHA_INSTALL=/opt/simvia; docker run --name simvia-installer -p 3333:3333 -e HYPHA_INSTALL=$HYPHA_INSTALL -v $HYPHA_INSTALL:$HYPHA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/simvia-installer:2025.3
+
+```
+
+Where `/opt/simvia` is the path to installation.  
+And open  http://localhost:3333 address
+
+To stop Simvia installer run
+
+```
+docker kill simvia-installer
+docker rm simvia-installer
+```
+
+
+2.1 Update with Simvia Installer
+You can use simvia-installer to update your existing Simvia installation started from version 2025.2
+Just set up your current Simvia installation path as `HYPHA_INSTALL` variable. For example
+
+```
+HYPHA_INSTALL=~/simvia; docker run --name hypha-installer -p 3333:3333 -e HYPHA_INSTALL=$HYPHA_INSTALL -v $HYPHA_INSTALL:$HYPHA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/hypha-installer:2025.3
+
+```
+
+### 2.2. Manual installation (All in one)
+
 
 **NOTE:** if you already have an installed version of Simvia please check the [Update section](#6-update-existing-installation) of this guide.
 
@@ -276,7 +315,7 @@ cp selfsigned/v3.ext ssl/
 
 | Key=Value                                                   | Description |
 | ----------------------------------------------------------------| ----------------- |
-| `HUB_ADMIN_PASSWORD`=root                                   | default password for first user: `admin@mycesys.com` |
+| `HUB_ADMIN_PASSWORD`=root                                   | default password for first user: `admin@simvia.ru` |
 | `HUB_AUTH_SECRET`=random_long_string_here                   | strong password (randomly generated) with length no less than 32 characters |
 | `HYPHA_SECRET`= random_long_string_here                     | strong password (randomly generated) with length no less than 32 characters |
 | `MYC_SERVICE_VAULT_ROLE_ID`= random_long_string_here        | strong password (randomly generated) with length no less than 32 characters |
@@ -290,13 +329,13 @@ cp selfsigned/v3.ext ssl/
   |----------------------------------------------|----------------------------------------------------|
   | `HUB_AUTH_MAIL_SERVER_HOST`=smtp.gmail.com   | mail server host                                   |
   | `HUB_AUTH_MAIL_SERVER_POST`=587              | mail server port                                   |
-  | `HUB_AUTH_MAIL_USERNAME`=no-reply@crplab.org | user name (email address) of the mail account      |
+  | `HUB_AUTH_MAIL_USERNAME`=no-reply@simvia.ru| user name (email address) of the mail account      |
   | `HUB_AUTH_MAIL_PASSWORD`=secret              | user password (or token) of the mail account       |
   | `HUB_AUTH_MAIL_PROTOCOL`=smtp                | protocol used for emails transferring              |
   | `HUB_AUTH_MAIL_SMTP_AUTH`=true               | use mail account authentication                    |
   | `HUB_AUTH_MAIL_TLS_ENABLE`=true              | use STARTLS protocol                               |
   | `HUB_AUTH_MAIL_SSL_ENABLE`=false             | use SSL protocol                                   |
-  | `HUB_AUTH_MAIL_FROM`=no-reply@crplab.org     | email address from which notifications will be sent |
+  | `HUB_AUTH_MAIL_FROM`=no-reply@simvia.ru    | email address from which notifications will be sent |
 
 
 ### 5. Troubleshooting
@@ -552,7 +591,7 @@ If you are using selfsigned certificates:
 
 **Update version**
 
-1. Download `config-migration_2025.2-2025.3.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2025.3/allinone/)
+1. Download `config-migration_2025.2-2025.3.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2025.3/allinone/config-migration_2025.2-2025.3.sh)
 2. Run migration script
 - Run script `config-migration_2025.2-2025.3.sh` in `./allinone` directory
 
