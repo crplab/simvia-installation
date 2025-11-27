@@ -315,7 +315,7 @@ cp selfsigned/v3.ext ssl/
 
 | Key=Value                                                   | Description |
 | ----------------------------------------------------------------| ----------------- |
-| `HUB_ADMIN_PASSWORD`=root                                   | default password for first user: `admin@mycesys.com` |
+| `HUB_ADMIN_PASSWORD`=root                                   | default password for first user: `admin@simvia.ru` |
 | `HUB_AUTH_SECRET`=random_long_string_here                   | strong password (randomly generated) with length no less than 32 characters |
 | `HYPHA_SECRET`= random_long_string_here                     | strong password (randomly generated) with length no less than 32 characters |
 | `MYC_SERVICE_VAULT_ROLE_ID`= random_long_string_here        | strong password (randomly generated) with length no less than 32 characters |
@@ -329,13 +329,13 @@ cp selfsigned/v3.ext ssl/
   |----------------------------------------------|----------------------------------------------------|
   | `HUB_AUTH_MAIL_SERVER_HOST`=smtp.gmail.com   | mail server host                                   |
   | `HUB_AUTH_MAIL_SERVER_POST`=587              | mail server port                                   |
-  | `HUB_AUTH_MAIL_USERNAME`=no-reply@crplab.org | user name (email address) of the mail account      |
+  | `HUB_AUTH_MAIL_USERNAME`=no-reply@simvia.ru| user name (email address) of the mail account      |
   | `HUB_AUTH_MAIL_PASSWORD`=secret              | user password (or token) of the mail account       |
   | `HUB_AUTH_MAIL_PROTOCOL`=smtp                | protocol used for emails transferring              |
   | `HUB_AUTH_MAIL_SMTP_AUTH`=true               | use mail account authentication                    |
   | `HUB_AUTH_MAIL_TLS_ENABLE`=true              | use STARTLS protocol                               |
   | `HUB_AUTH_MAIL_SSL_ENABLE`=false             | use SSL protocol                                   |
-  | `HUB_AUTH_MAIL_FROM`=no-reply@crplab.org     | email address from which notifications will be sent |
+  | `HUB_AUTH_MAIL_FROM`=no-reply@simvia.ru    | email address from which notifications will be sent |
 
 
 ### 5. Troubleshooting
