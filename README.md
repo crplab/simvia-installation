@@ -591,7 +591,7 @@ If you are using selfsigned certificates:
 
 **Update version**
 
-1. Download `config-migration_2025.2-2025.3.sh` script from the [repository](https://github.com/mycesys/hypha-installation/tree/2025.3/allinone/)
+1. Download `config-migration_2025.2-2025.3.sh` script from the [repository](https://github.com/crplab/simvia-installation/tree/2025.3/allinone/config-migration_2025.2-2025.3.sh)
 2. Run migration script
 - Run script `config-migration_2025.2-2025.3.sh` in `./allinone` directory
 
