@@ -23,8 +23,9 @@ Simvia is an SPDM system that allows to manage data and simulations, run computa
 4. [Technical details](#4-technical-details)
 - [Directories](#list-of-directories)
 - [Environment configuration](#environment-configuration)
-5. [Troubleshooting](#5-troubleshooting)
-6. [Update existing installation](#6-update-existing-installation)
+5. [Your own SSL-certificate](#5-your-own-ssl-certificate)
+6. [Troubleshooting](#6-troubleshooting)
+7. [Update existing installation](#7-update-existing-installation)
 - [2023.1 to 2023.2](#20231-to-20232)
 - [2023.2 to 2023.3](#20232-to-20233)
 - [2023.4 to 2024.1](#20233-to-20241)
@@ -338,8 +339,11 @@ cp selfsigned/v3.ext ssl/
   | `HUB_AUTH_MAIL_SSL_ENABLE`=false             | use SSL protocol                                   |
   | `HUB_AUTH_MAIL_FROM`=no-reply@simvia.ru    | email address from which notifications will be sent |
 
+### 5. Your own SSL-certificate
 
-### 5. Troubleshooting
+You can use your own web server to obtain TLS/SSL and run Hypha behind it. See [README.nossl.md](./README.nossl.md)
+
+### 6. Troubleshooting
 
 #### Common techniques
 
@@ -422,7 +426,7 @@ iptables -t nat -A POSTROUTING --source yyy.yyy.yyy.yyy  --destination xxx.xxx.x
       - "<HYPHA_PUBLIC_DOMAIN>:yyy.yyy.yyy.yyy"
 ```
 
-### 6. Update existing installation
+### 7. Update existing installation
 
 **Before update:**
 
