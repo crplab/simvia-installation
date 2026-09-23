@@ -102,7 +102,7 @@ How to run:
 If you need a new installation of Simvia you must run
 
 ```
-HYPHA_INSTALL=/opt/simvia; docker run --name simvia-installer -p 3333:3333 -e HYPHA_INSTALL=$HYPHA_INSTALL -v $HYPHA_INSTALL:$HYPHA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/simvia-installer:2026.2
+SIMVIA_INSTALL=/opt/simvia; docker run --name simvia-installer -p 3333:3333 -e HYPHA_INSTALL=$SIMVIA_INSTALL -v $SIMVIA_INSTALL:$SIMVIA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/simvia-installer:2026.2
 
 ```
 
@@ -122,7 +122,7 @@ You can use simvia-installer to update your existing Simvia installation started
 Just set up your current Simvia installation path as `HYPHA_INSTALL` variable. For example
 
 ```
-HYPHA_INSTALL=~/simvia; docker run --name hypha-installer -p 3333:3333 -e HYPHA_INSTALL=$HYPHA_INSTALL -v $HYPHA_INSTALL:$HYPHA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/hypha-installer:2026.2
+SIMVIA_INSTALL=~/simvia; docker run --name simvia-installer -p 3333:3333 -e HYPHA_INSTALL=$SIMVIA_INSTALL -v $SIMVIA_INSTALL:$SIMVIA_INSTALL -v /var/run/docker.sock:/var/run/docker.sock -it mycesys/simvia-installer:2026.2
 
 ```
 
